@@ -1,193 +1,5 @@
 'use strict';
 
-// Remove all of an element's children
-var emptyNode = function(node){
-	while (node.firstChild) {
-		node.removeChild(node.firstChild);
-	}
-};
-
-// Palette
-var palette = {
-	container: document.getElementById('palette-container'),
-	header: document.getElementById('palette-header'),
-	fileInput: document.getElementById('atlas-load'),
-	tiles: document.getElementById('palette-tiles'),
-	resizeCorner: document.getElementById('palette-resize-corner'),
-	selectedTile: '',
-	dragging: {
-		enabled: false,
-		downX: 0,
-		downY: 0,
-		x: 0,
-		y: 0
-	},
-	resizing: {
-		enabled: false,
-		downX: 0,
-		downY: 0,
-		width: 0,
-		height: 0
-	}
-};
-
-palette.container.style.left = '5px';
-palette.container.style.top = '5px';
-palette.container.style.width = '315px';
-palette.tiles.style.height = '515px';
-
-palette.container.addEventListener('mousedown', function(e){
-	if (e.target.dataset.name) {
-		isoMapper.cursorType = e.target.dataset.name;
-		var previousSelected = palette.container.querySelector('.palette-tile-selected');
-		if (previousSelected) {
-			previousSelected.classList.remove('palette-tile-selected');
-		}
-		e.target.classList.add('palette-tile-selected');
-	}
-	e.preventDefault();
-});
-
-palette.header.addEventListener('mousedown', function(e){
-	if (e.buttons & 1) {
-		palette.dragging.enabled = true;
-		palette.dragging.downX = e.clientX;
-		palette.dragging.downY = e.clientY;
-		palette.dragging.x = parseInt(palette.container.style.left, 10);
-		palette.dragging.y = parseInt(palette.container.style.top, 10);
-	}
-	e.preventDefault();
-});
-
-window.addEventListener('mouseup', function(e){
-	// Left button
-	var leftDown = !!(e.buttons & 1);
-	palette.dragging.enabled = palette.dragging.enabled && leftDown;
-	palette.resizing.enabled = palette.resizing.enabled && leftDown;
-});
-
-window.addEventListener('mousemove', function(e){
-	if (palette.dragging.enabled) {
-		palette.container.style.left = (palette.dragging.x + e.clientX - palette.dragging.downX) + 'px';
-		palette.container.style.top = (palette.dragging.y + e.clientY - palette.dragging.downY) + 'px';
-	}
-	if (palette.resizing.enabled) {
-		palette.container.style.width = (palette.resizing.width + e.clientX - palette.resizing.downX) + 'px';
-		palette.tiles.style.height = (palette.resizing.height + e.clientY - palette.resizing.downY) + 'px';
-	}
-	e.preventDefault();
-});
-
-palette.resizeCorner.addEventListener('mousedown', function(e){
-	if (e.buttons & 1) {
-		palette.resizing.enabled = true;
-		palette.resizing.downX = e.clientX;
-		palette.resizing.downY = e.clientY;
-		palette.resizing.width = parseInt(palette.container.style.width, 10);
-		palette.resizing.height = parseInt(palette.tiles.style.height, 10);
-	}
-	e.preventDefault();
-});
-
-palette.fileInput.addEventListener('change', function(e){
-	for (var fileIndex = 0; fileIndex < e.target.files.length; fileIndex++) {
-		var file = e.target.files[fileIndex];
-		if (/\.json/.test(file.name)) {
-			readJSON(file);
-		} else {
-			readImage(file);
-		}
-	}
-});
-
-var readJSON = function(file){
-	try {
-		var reader = new FileReader();
-		reader.onload = function(){
-			var fileName = file.name.match(/(.*)\./)[1];
-			atlas.manifestLib[fileName] = JSON.parse(reader.result);
-			atlas.addToPalette();
-		};
-		reader.readAsText(file);
-	} catch (err) {
-		console.error('Error: ' + file.name + ' is not a valid JSON file.');
-	}
-};
-
-var readImage = function(file){
-	try {
-		var reader = new FileReader();
-		reader.onload = function(){
-			var fileName = file.name.match(/(.*)\./)[1];
-			atlas.imgLib[fileName] = document.createElement('img');
-			atlas.imgLib[fileName].src = reader.result;
-			atlas.addToPalette();
-		};
-		reader.readAsDataURL(file);
-	} catch (err) {
-		console.error('Error: ' + file.name + ' is not a valid image.');
-	}
-};
-
-// Image Atlasing
-var atlas = {
-	imgLib: {},
-	manifestLib: {},
-	manifest: {},
-	canvas: document.createElement('canvas'),
-	addToPalette: function(){
-		emptyNode(palette.tiles);
-		var fileNameRegex = /(.*)\./;
-		for (var atlasName in atlas.manifestLib) {
-			if (atlas.manifestLib.hasOwnProperty(atlasName) && atlas.imgLib.hasOwnProperty(atlasName)) {
-				var img = atlas.imgLib[atlasName];
-				var manifest = atlas.manifestLib[atlasName];
-
-				for (var tileIndex = 0; tileIndex < manifest['tiles'].length; tileIndex++) {
-					var tile = manifest['tiles'][tileIndex];
-					var fileNameMatch = tile['name'].match(fileNameRegex);
-					var imgName = fileNameMatch ? fileNameMatch[1] : tile['name'];
-					// Do some jiggery pokery to the offsets to ensure it's being drawn on the pixel regardless of whether width and height are even
-					// Width gets the 1 minus because of the +0.5 that's given to it elsewhere
-					atlas.manifest[imgName] = {
-						source: img,
-						sourceX: tile['sourceX'],
-						sourceY: tile['sourceY'],
-						width: tile['trimmedWidth'],
-						height: tile['trimmedHeight'],
-						offsetX: tile['trimmedX'] - (tile['width'] + (1 - tile['width'] % 2)) / 2,
-						offsetY: tile['trimmedY'] - (tile['height'] + tile['height'] % 2) / 2
-					};
-					atlas.canvas.width = atlas.manifest[imgName].width;
-					atlas.canvas.height = atlas.manifest[imgName].height;
-
-					// image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight
-					atlas.ctx.drawImage(
-						atlas.manifest[imgName].source,
-						atlas.manifest[imgName].sourceX,
-						atlas.manifest[imgName].sourceY,
-						atlas.manifest[imgName].width,
-						atlas.manifest[imgName].height,
-						0,
-						0,
-						atlas.manifest[imgName].width,
-						atlas.manifest[imgName].height
-					);
-
-					var paletteImg = document.createElement('img');
-					paletteImg.src = atlas.canvas.toDataURL();
-					paletteImg.dataset.name = imgName;
-					paletteImg.classList.add('noselect');
-
-					palette.tiles.appendChild(paletteImg);
-				}
-			}
-		}
-	}
-};
-atlas.ctx = atlas.canvas.getContext('2d');
-
-// IsoMapper
 var isoMapper = {};
 
 var COS30DEG = Math.cos(2 * Math.PI / 12);
@@ -331,7 +143,6 @@ isoMapper.canvasMain.addEventListener('mousedown', function(e){
 			isoMapper.mouseInteraction.mouseLeftShift = false;
 			isoMapper.currentMap.addTile(isoMapper.cursorCoordinate.x, isoMapper.cursorCoordinate.y, isoMapper.cursorCoordinate.z);
 		}
-		// console.log(isoMapper.currentMap);
 	} else {
 		isoMapper.mouseInteraction.mouseLeftDown = false;
 	}
@@ -372,14 +183,6 @@ isoMapper.canvasMain.addEventListener('mouseenter', function(e){
 	}
 });
 
-window.addEventListener('mousemove', function(e){
-	if (isoMapper.mouseInteraction.mouseMiddleDown) {
-		isoMapper.viewPosition.x = isoMapper.mouseInteraction.viewPosition.x - (e.clientX - isoMapper.mouseInteraction.downPosition.x);
-		isoMapper.viewPosition.y = isoMapper.mouseInteraction.viewPosition.y - (e.clientY - isoMapper.mouseInteraction.downPosition.y);
-		isoMapper.isDirty.all = true;
-	}
-});
-
 isoMapper.canvasMain.addEventListener('mousemove', function(e){
 	if (!palette.dragging.enabled && !palette.resizing.enabled) {
 		var newCursorX = Math.floor(isoMapper.positionToCoordinateX(e.clientX + isoMapper.viewPosition.x, e.clientY + isoMapper.viewPosition.y));
@@ -405,11 +208,6 @@ isoMapper.canvasMain.addEventListener('wheel', function(e){
 	isoMapper.mouseInteraction.scrollDeltaY += e.deltaY;
 	isoMapper.cursorCoordinate.z = Math.floor(isoMapper.mouseInteraction.scrollDeltaY / -100);
 	isoMapper.isDirty.cursor = true;
-});
-
-window.addEventListener('resize', function(e){
-	isoMapper.generateGrid();
-	isoMapper.isDirty.all = true;
 });
 
 isoMapper.coordinateToPositionX = function(coordinateX, coordinateY){
@@ -649,7 +447,3 @@ isoMapper.drawVectorTile = function(ctx, coordinateX, coordinateY, coordinateZ, 
 	ctx.closePath();
 	ctx.fill();
 };
-
-isoMapper.generateGrid();
-isoMapper.view.reset();
-window.requestAnimationFrame(isoMapper.draw);
