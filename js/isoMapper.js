@@ -45,39 +45,57 @@ isoMapper.view.reset = function(){
 	isoMapper.viewPosition.y = isoMapper.tileLength / 2 - isoMapper.canvasMain.height / 2;
 };
 
-isoMapper.currentMap = {
-	startIndexX: 0,
-	endIndexX: 0,
-	startIndexY: 0,
-	endIndexY: 0,
-	map: {
+isoMapper.defaultMap = {
+	'startIndexX': 0,
+	'endIndexX': 0,
+	'startIndexY': 0,
+	'endIndexY': 0,
+	'map': {
 		0: {
 			0: {
-				startIndexZ: 0,
-				endIndexZ: 0,
+				'startIndexZ': 0,
+				'endIndexZ': 0,
 				0: {
-					type: ''
+					'type': ''
+				}
+			}
+		}
+	}
+};
+
+isoMapper.currentMap = {
+	'startIndexX': 0,
+	'endIndexX': 0,
+	'startIndexY': 0,
+	'endIndexY': 0,
+	'map': {
+		0: {
+			0: {
+				'startIndexZ': 0,
+				'endIndexZ': 0,
+				0: {
+					'type': ''
 				}
 			}
 		}
 	},
 	draw: function(ctx){
-		var dX = isoMapper.currentMap.endIndexX - isoMapper.currentMap.startIndexX + 1;
-		var dY = isoMapper.currentMap.endIndexY - isoMapper.currentMap.startIndexY + 1;
+		var dX = isoMapper.currentMap['endIndexX'] - isoMapper.currentMap['startIndexX'] + 1;
+		var dY = isoMapper.currentMap['endIndexY'] - isoMapper.currentMap['startIndexY'] + 1;
 
 		for (var x = 0; x < dX + dY - 1; x++) {
 			for (var y = Math.min(dY - 1, x), len = Math.max(0, x - dX + 1); y >= len; y--) {
-				var cx = isoMapper.currentMap.startIndexX + x - y;
-				var cy = isoMapper.currentMap.startIndexY + y;
-				var pillar = isoMapper.currentMap.map[cx] && isoMapper.currentMap.map[cx][cy];
+				var cx = isoMapper.currentMap['startIndexX'] + x - y;
+				var cy = isoMapper.currentMap['startIndexY'] + y;
+				var pillar = isoMapper.currentMap['map'][cx] && isoMapper.currentMap['map'][cx][cy];
 				if (pillar) {
-					for (var cz = pillar.startIndexZ; cz <= pillar.endIndexZ; cz++) {
+					for (var cz = pillar['startIndexZ']; cz <= pillar['endIndexZ']; cz++) {
 						var tile = pillar[cz];
 						if (tile) {
-							if (tile.type === '') {
+							if (tile['type'] === '') {
 								isoMapper.drawVectorTile(ctx, cx, cy, cz, isoMapper.solidTileColour);
 							} else {
-								isoMapper.drawGraphicTile(ctx, cx, cy, cz, tile.type);
+								isoMapper.drawGraphicTile(ctx, cx, cy, cz, tile['type']);
 							}
 							// isoMapper.drawVectorTile(ctx, cx, cy, cz, {
 							// 	top:   'rgba(0,0,0,'+(0.2-cz*0.05)+')',
@@ -93,36 +111,45 @@ isoMapper.currentMap = {
 		}
 	},
 	addTile: function(x, y, z){
-		isoMapper.currentMap.map[x] = isoMapper.currentMap.map[x] || {};
-		isoMapper.currentMap.map[x][y] = isoMapper.currentMap.map[x][y] || {startIndexZ: z, endIndexZ: z};
-		isoMapper.currentMap.map[x][y][z] = isoMapper.currentMap.map[x][y][z] || {type: isoMapper.cursorType};
-		if (x < isoMapper.currentMap.startIndexX) {
-			isoMapper.currentMap.startIndexX = x;
-		} else if (x > isoMapper.currentMap.endIndexX) {
-			isoMapper.currentMap.endIndexX = x;
+		isoMapper.currentMap['map'][x] = isoMapper.currentMap['map'][x] || {};
+		isoMapper.currentMap['map'][x][y] = isoMapper.currentMap['map'][x][y] || {'startIndexZ': z, 'endIndexZ': z};
+		isoMapper.currentMap['map'][x][y][z] = isoMapper.currentMap['map'][x][y][z] || {'type': isoMapper.cursorType};
+		if (x < isoMapper.currentMap['startIndexX']) {
+			isoMapper.currentMap['startIndexX'] = x;
+		} else if (x > isoMapper.currentMap['endIndexX']) {
+			isoMapper.currentMap['endIndexX'] = x;
 		}
-		if (y < isoMapper.currentMap.startIndexY) {
-			isoMapper.currentMap.startIndexY = y;
-		} else if (y > isoMapper.currentMap.endIndexY) {
-			isoMapper.currentMap.endIndexY = y;
+		if (y < isoMapper.currentMap['startIndexY']) {
+			isoMapper.currentMap['startIndexY'] = y;
+		} else if (y > isoMapper.currentMap['endIndexY']) {
+			isoMapper.currentMap['endIndexY'] = y;
 		}
-		if (z < isoMapper.currentMap.map[x][y].startIndexZ) {
-			isoMapper.currentMap.map[x][y].startIndexZ = z;
-		} else if (z > isoMapper.currentMap.map[x][y].endIndexZ) {
-			isoMapper.currentMap.map[x][y].endIndexZ = z;
+		if (z < isoMapper.currentMap['map'][x][y]['startIndexZ']) {
+			isoMapper.currentMap['map'][x][y]['startIndexZ'] = z;
+		} else if (z > isoMapper.currentMap['map'][x][y]['endIndexZ']) {
+			isoMapper.currentMap['map'][x][y]['endIndexZ'] = z;
 		}
 		isoMapper.isDirty.main = true;
 	},
 	removeTile: function(x, y, z){
-		if (isoMapper.currentMap.map[x]) {
-			if (isoMapper.currentMap.map[x][y]) {
-				if (isoMapper.currentMap.map[x][y][z]) {
-					isoMapper.currentMap.map[x][y][z] = null;
+		if (isoMapper.currentMap['map'][x]) {
+			if (isoMapper.currentMap['map'][x][y]) {
+				if (isoMapper.currentMap['map'][x][y][z]) {
+					isoMapper.currentMap['map'][x][y][z] = null;
 				}
 			}
 		}
 		isoMapper.isDirty.main = true;
 	}
+};
+
+isoMapper.setCurrentMap = function(mapData){
+	isoMapper.currentMap['startIndexX'] = mapData['startIndexX'];
+	isoMapper.currentMap['endIndexX'] = mapData['endIndexX'];
+	isoMapper.currentMap['startIndexY'] = mapData['startIndexY'];
+	isoMapper.currentMap['endIndexY'] = mapData['endIndexY'];
+	isoMapper.currentMap['map'] = mapData['map'];
+	isoMapper.isDirty.all = true;
 };
 
 isoMapper.mouseInteraction = {
@@ -184,12 +211,11 @@ isoMapper.canvasMain.addEventListener('mouseenter', function(e){
 });
 
 isoMapper.canvasMain.addEventListener('mousemove', function(e){
-	if (!palette.dragging.enabled && !palette.resizing.enabled) {
+	if (!tools.dragging.enabled && !palette.dragging.enabled && !palette.resizing.enabled) {
 		var newCursorX = Math.floor(isoMapper.positionToCoordinateX(e.clientX + isoMapper.viewPosition.x, e.clientY + isoMapper.viewPosition.y));
 		// Add one to adjust cursor position relative to mouse position
 		var newCursorY = Math.floor(isoMapper.positionToCoordinateY(e.clientX + isoMapper.viewPosition.x, e.clientY + isoMapper.viewPosition.y)) + 1;
 		if (newCursorX !== isoMapper.cursorCoordinate.x || newCursorY !== isoMapper.cursorCoordinate.y) {
-			// console.log(newCursorX, newCursorY);
 			isoMapper.cursorCoordinate.x = newCursorX;
 			isoMapper.cursorCoordinate.y = newCursorY;
 			isoMapper.isDirty.cursor = true;
@@ -384,7 +410,7 @@ isoMapper.drawGraphicTile = function(ctx, coordinateX, coordinateY, coordinateZ,
 	var startX = isoMapper.coordinateToPositionX(coordinateX, coordinateY) - isoMapper.viewPosition.x + isoMapper.verticalLineHorizontalSpacing;
 	var startY = isoMapper.coordinateToPositionY(coordinateX, coordinateY) - isoMapper.viewPosition.y + (isoMapper.tileLength / 2) - (coordinateZ * isoMapper.tileLength / isoMapper.zSteps);
 
-	var img = atlas.manifest[imgName];
+	var img = atlas.manifest[imgName] || atlas.manifest['missing-tile'];
 
 	// image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight
 	ctx.drawImage(

@@ -1,9 +1,8 @@
-
 body {
     font-family: sans-serif;
 }
 
-#fullscreen {
+#fullScreen {
     position: fixed;
     top: 0;
     right: 0;
@@ -11,7 +10,7 @@ body {
     left: 0;
 }
 
-.canvas-fullscreen {
+.canvas-fullScreen {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -21,13 +20,13 @@ body {
     pointer-events: none;
 }
 
-#palette-container {
+.menu-container {
     position: fixed;
     background-color: white;
     border: black 1px solid;
 }
 
-#palette-header {
+.menu-header {
     padding: 2px 3px 0 3px;
     border-bottom: black 1px solid;
     cursor: move;
@@ -48,6 +47,14 @@ body {
     overflow-y: scroll;
 }
 
+.palette-tile:hover {
+    background-color: rgba(66, 203, 255, 0.2);
+}
+
+.palette-tile-selected {
+    background-color: rgba(66, 203, 255, 0.5) !important;
+}
+
 #palette-resize-corner {
     position: absolute;
     right: 0;
@@ -63,11 +70,21 @@ body {
     background-color: rgb(168, 236, 255);
 }
 
-.palette-tile-selected {
-    background-color: rgba(66, 203, 255, 0.5);
+.tools-operation {
+    font-size: 0.9em;
+    padding: 0 3px;
+    cursor: default;
 }
 
-.noselect {
+.tools-operation:hover {
+    background-color: rgba(66, 203, 255, 0.2);
+}
+
+.tools-operation-selected {
+    background-color: rgba(66, 203, 255, 0.5) !important;
+}
+
+.noSelect {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Chrome/Safari/Opera */
     -khtml-user-select: none; /* Konqueror */
@@ -76,3 +93,4 @@ body {
     user-select: none;
     /* non-prefixed version, currently not supported by any browser */
 }
+
