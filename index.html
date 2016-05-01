@@ -3,85 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>IsoMapper</title>
-    <style>
-        body {
-            font-family: sans-serif;
-        }
-
-        #fullscreen {
-            position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-        }
-
-        .canvas-fullscreen {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-
-        #canvas-cursor {
-            pointer-events: none;
-        }
-
-        #palette-container {
-            position: fixed;
-            background-color: white;
-            border: black 1px solid;
-        }
-
-        #palette-header {
-            padding: 2px 3px 0 3px;
-            border-bottom: black 1px solid;
-            cursor: move;
-            background-color: #f6f6f6;
-        }
-
-        #palette-container img {
-            display: block;
-            float: left;
-        }
-
-        #palette-container img:last-child {
-            border-bottom: none;
-            display: block;
-        }
-
-        #palette-tiles {
-            overflow-y: scroll;
-        }
-
-        #palette-resize-corner {
-            position: absolute;
-            right: 0;
-            bottom: 0;
-            width: 17px;
-            height: 17px;
-            cursor: se-resize;
-            background: url(img/se-resize-icon.png);
-            background-color: rgb(241, 241, 241);;
-        }
-
-        #palette-resize-corner:hover {
-            background-color: rgb(168, 236, 255);
-        }
-
-        .palette-tile-selected {
-            background-color: rgba(66, 203, 255, 0.5);
-        }
-
-        .noselect {
-            -webkit-touch-callout: none; /* iOS Safari */
-            -webkit-user-select: none; /* Chrome/Safari/Opera */
-            -khtml-user-select: none; /* Konqueror */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE/Edge */
-            user-select: none;
-            /* non-prefixed version, currently not supported by any browser */
-        }
-    </style>
+    <link rel="shortcut icon" type="image/png" href="img/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
 <body>
 <div id="fullscreen">
@@ -99,5 +22,5 @@
     <!--</div>-->
 </div>
 </body>
-<script src="isomapper.js"></script>
+<script src="js/isoMapper.js"></script>
 </html>
