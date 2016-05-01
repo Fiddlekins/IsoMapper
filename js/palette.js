@@ -36,6 +36,36 @@ var palette = {
 		}
 		palette.container.style.width = settings['ui']['palette']['width'];
 		palette.tiles.style.height = settings['ui']['palette']['height'];
+	},
+	updateTiles: function(){
+		emptyNode(palette.tiles);
+		for (var imgName in atlas.manifest) {
+			if (atlas.manifest.hasOwnProperty(imgName) && imgName !== 'missing-tile') {
+				atlas.canvas.width = atlas.manifest[imgName].width;
+				atlas.canvas.height = atlas.manifest[imgName].height;
+
+				// image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight
+				atlas.ctx.drawImage(
+					atlas.manifest[imgName].source,
+					atlas.manifest[imgName].sourceX,
+					atlas.manifest[imgName].sourceY,
+					atlas.manifest[imgName].width,
+					atlas.manifest[imgName].height,
+					0,
+					0,
+					atlas.manifest[imgName].width,
+					atlas.manifest[imgName].height
+				);
+
+				var paletteImg = document.createElement('img');
+				paletteImg.src = atlas.canvas.toDataURL();
+				paletteImg.dataset.name = imgName;
+				paletteImg.classList.add('palette-tile');
+				paletteImg.classList.add('noSelect');
+
+				palette.tiles.appendChild(paletteImg);
+			}
+		}
 	}
 };
 
@@ -107,5 +137,12 @@ palette.fileInputReadImage = function(file){
 		reader.readAsDataURL(file);
 	} catch (err) {
 		console.error('Error: ' + file.name + ' is not a valid image.');
+	}
+};
+
+// Remove all of an element's children
+var emptyNode = function(node){
+	while (node.firstChild) {
+		node.removeChild(node.firstChild);
 	}
 };
