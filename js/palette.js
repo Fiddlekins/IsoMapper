@@ -20,13 +20,24 @@ var palette = {
 		downY: 0,
 		width: 0,
 		height: 0
+	},
+	updatePosition: function(left, top){
+		if (left !== undefined && top !== undefined) {
+			settings['ui']['palette']['left'] = left;
+			settings['ui']['palette']['top'] = top;
+		}
+		palette.container.style.left = settings['ui']['palette']['left'];
+		palette.container.style.top = settings['ui']['palette']['top'];
+	},
+	updateDimensions: function(width, height){
+		if (width !== undefined && height !== undefined) {
+			settings['ui']['palette']['width'] = width;
+			settings['ui']['palette']['height'] = height;
+		}
+		palette.container.style.width = settings['ui']['palette']['width'];
+		palette.tiles.style.height = settings['ui']['palette']['height'];
 	}
 };
-
-palette.container.style.left = '5px';
-palette.container.style.top = '5px';
-palette.container.style.width = '315px';
-palette.tiles.style.height = '515px';
 
 palette.container.addEventListener('mousedown', function(e){
 	if (e.target.dataset.name) {
@@ -66,20 +77,19 @@ palette.fileInput.addEventListener('change', function(e){
 	for (var fileIndex = 0; fileIndex < e.target.files.length; fileIndex++) {
 		var file = e.target.files[fileIndex];
 		if (/\.json/.test(file.name)) {
-			readJSON(file);
+			palette.fileInputReadJSON(file);
 		} else {
-			readImage(file);
+			palette.fileInputReadImage(file);
 		}
 	}
 });
 
-var readJSON = function(file){
+palette.fileInputReadJSON = function(file){
 	try {
 		var reader = new FileReader();
 		reader.onload = function(){
 			var fileName = file.name.match(/(.*)\./)[1];
-			atlas.manifestLib[fileName] = JSON.parse(reader.result);
-			atlas.addToPalette();
+			atlas.addToManifestLib(fileName, JSON.parse(reader.result));
 		};
 		reader.readAsText(file);
 	} catch (err) {
@@ -87,14 +97,12 @@ var readJSON = function(file){
 	}
 };
 
-var readImage = function(file){
+palette.fileInputReadImage = function(file){
 	try {
 		var reader = new FileReader();
 		reader.onload = function(){
 			var fileName = file.name.match(/(.*)\./)[1];
-			atlas.imgLib[fileName] = document.createElement('img');
-			atlas.imgLib[fileName].src = reader.result;
-			atlas.addToPalette();
+			atlas.addToImgLib(fileName, reader.result);
 		};
 		reader.readAsDataURL(file);
 	} catch (err) {
