@@ -8,7 +8,7 @@ var atlas = {
 	addToImgLib: function(fileName, data){
 		atlas.imgLib[fileName] = document.createElement('img');
 		atlas.imgLib[fileName].src = data;
-		atlas.updateManifest();
+		atlas.imgLib[fileName].onload = atlas.updateManifest; // Make sure image has loaded before updating the palette
 	},
 	addToManifestLib: function(fileName, data){
 		atlas.manifestLib[fileName] = data;
