@@ -3,7 +3,20 @@
 var palette = {
 	container: document.getElementById('palette-container'),
 	header: document.getElementById('palette-header'),
-	fileInput: document.getElementById('atlas-load'),
+	addImageButton: document.getElementById('palette-add-image'),
+	addAtlasButton: document.getElementById('palette-add-atlas'),
+	imageFileInput: (function(){
+		var input = document.createElement('input');
+		input.type = 'file';
+		input.multiple = true;
+		return input;
+	})(),
+	atlasFileInput: (function(){
+		var input = document.createElement('input');
+		input.type = 'file';
+		input.multiple = true;
+		return input;
+	})(),
 	tiles: document.getElementById('palette-tiles'),
 	resizeCorner: document.getElementById('palette-resize-corner'),
 	selectedTile: '',
@@ -69,6 +82,15 @@ var palette = {
 	}
 };
 
+palette.addImageButton.addEventListener('mousedown', function(e){
+});
+
+palette.addAtlasButton.addEventListener('mousedown', function(e){
+	e.stopPropagation();
+	var clickEvent = new MouseEvent('click');
+	palette.atlasFileInput.dispatchEvent(clickEvent);
+});
+
 palette.container.addEventListener('mousedown', function(e){
 	if (e.target.dataset.name) {
 		isoMapper.cursorType = e.target.dataset.name;
@@ -103,7 +125,7 @@ palette.resizeCorner.addEventListener('mousedown', function(e){
 	e.preventDefault();
 });
 
-palette.fileInput.addEventListener('change', function(e){
+palette.atlasFileInput.addEventListener('change', function(e){
 	for (var fileIndex = 0; fileIndex < e.target.files.length; fileIndex++) {
 		var file = e.target.files[fileIndex];
 		if (/\.json/.test(file.name)) {
