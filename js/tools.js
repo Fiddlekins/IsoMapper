@@ -68,7 +68,7 @@ tools.zIndexInput.addEventListener('keydown', function(e){
 });
 
 tools.updateZIndex = function(value){
-	tools.previouslyValidXIndexInput = Math.max(Math.min(value, 25), 0.25);
+	tools.previouslyValidXIndexInput = Math.max(Math.min(value, 10), 0.25);
 	tools.zIndexInput.innerHTML = tools.previouslyValidXIndexInput;
 	isoMapper.interaction.zIndexStep = 4 * tools.previouslyValidXIndexInput;
 	settings['zIndexStep'] = isoMapper.interaction.zIndexStep;
