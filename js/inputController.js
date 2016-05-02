@@ -45,6 +45,12 @@ window.addEventListener('mouseup', function(e){
 	tools.dragging.enabled = tools.dragging.enabled && leftDown;
 	palette.dragging.enabled = palette.dragging.enabled && leftDown;
 	palette.resizing.enabled = palette.resizing.enabled && leftDown;
+	// Right button
+	var rightDown = !!(e.buttons & 2);
+	isoMapper.interaction.mouse.rightDown = isoMapper.interaction.mouse.rightDown && rightDown;
+	// Middle button
+	var middleDown = !!(e.buttons & 4);
+	isoMapper.interaction.mouse.middleDown = isoMapper.interaction.mouse.middleDown && middleDown;
 });
 
 window.addEventListener('resize', function(e){
