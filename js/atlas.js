@@ -46,3 +46,126 @@ var atlas = {
 };
 
 atlas.ctx = atlas.canvas.getContext('2d');
+
+atlas.processRawImage = function(file){
+	var reader = new FileReader();
+	reader.onload = function(){
+		var dataUrl = reader.result;
+		var stagingImage = document.createElement('img');
+		stagingImage.src = dataUrl;
+
+		var stagingCanvas = document.createElement('canvas');
+		var ctx = stagingCanvas.getContext('2d');
+
+		stagingImage.onload = function(){
+			stagingCanvas.width = stagingImage.width;
+			stagingCanvas.height = stagingImage.height;
+			ctx.drawImage(stagingImage, 0, 0);
+			var imgData = ctx.getImageData(0, 0, stagingCanvas.width, stagingCanvas.height);
+			var trimmedDimensions = atlas.getTrimmedDimensions(imgData);
+
+			// By resizing the canvas we should also fully clean it
+			stagingCanvas.width = trimmedDimensions.width;
+			stagingCanvas.height = trimmedDimensions.height;
+
+			ctx.drawImage(
+				stagingImage,
+				trimmedDimensions.x,
+				trimmedDimensions.y,
+				trimmedDimensions.width,
+				trimmedDimensions.height,
+				0,
+				0,
+				trimmedDimensions.width,
+				trimmedDimensions.height
+			);
+
+			atlas.addToImgLib(file.name, stagingCanvas.toDataURL());
+			atlas.addToManifestLib(file.name, {
+				'tiles': [
+					{
+						'name': file.name,
+						'sourceX': 0,
+						'sourceY': 0,
+						'width': stagingImage.width,
+						'height': stagingImage.height,
+						'trimmedX': trimmedDimensions.x,
+						'trimmedY': trimmedDimensions.y,
+						'trimmedWidth': trimmedDimensions.width,
+						'trimmedHeight': trimmedDimensions.height
+					}
+				]
+			});
+		};
+	};
+	reader.readAsDataURL(file);
+};
+
+atlas.getTrimmedDimensions = function(imgData){
+	var output = {
+		x: 0,
+		y: 0,
+		width: imgData.width,
+		height: imgData.height
+	};
+
+	var x;
+	var y;
+	var w = imgData.width;
+	var h = imgData.height;
+	var alpha;
+
+	// Run along the top edge
+	for (y = 0; y < h; y++) {
+		for (x = 0; x < w; x++) {
+			alpha = imgData.data[atlas.getPixelDataIndex(x, y, w, h, 3)];
+			if (alpha > 0) {
+				output.y = y;
+				y = h; // Break outer loop
+				break;
+			}
+		}
+	}
+
+	// Run along the bottom edge
+	for (y = h - 1; y > 0; y--) {
+		for (x = 0; x < w; x++) {
+			alpha = imgData.data[atlas.getPixelDataIndex(x, y, w, h, 3)];
+			if (alpha > 0) {
+				output.height = y - output.y + 1;
+				y = 0; // Break outer loop
+				break;
+			}
+		}
+	}
+
+	// Run along the left edge
+	for (x = 0; x < w; x++) {
+		for (y = output.y; y < output.y + output.height; y++) {
+			alpha = imgData.data[atlas.getPixelDataIndex(x, y, w, h, 3)];
+			if (alpha > 0) {
+				output.x = x;
+				x = w; // Break outer loop
+				break;
+			}
+		}
+	}
+
+	// Run along the right edge
+	for (x = w - 1; x > 0; x--) {
+		for (y = output.y; y < output.y + output.height; y++) {
+			alpha = imgData.data[atlas.getPixelDataIndex(x, y, w, h, 3)];
+			if (alpha > 0) {
+				output.width = x - output.x + 1;
+				x = 0; // Break outer loop
+				break;
+			}
+		}
+	}
+
+	return output;
+};
+
+atlas.getPixelDataIndex = function(x, y, w, h, typeOffset){
+	return (((y * w) + x) * 4) + typeOffset;
+};

@@ -83,6 +83,9 @@ var palette = {
 };
 
 palette.addImageButton.addEventListener('mousedown', function(e){
+	e.stopPropagation();
+	var clickEvent = new MouseEvent('click');
+	palette.imageFileInput.dispatchEvent(clickEvent);
 });
 
 palette.addAtlasButton.addEventListener('mousedown', function(e){
@@ -125,18 +128,25 @@ palette.resizeCorner.addEventListener('mousedown', function(e){
 	e.preventDefault();
 });
 
+palette.imageFileInput.addEventListener('change', function(e){
+	for (var fileIndex = 0; fileIndex < e.target.files.length; fileIndex++) {
+		var file = e.target.files[fileIndex];
+		atlas.processRawImage(file);
+	}
+});
+
 palette.atlasFileInput.addEventListener('change', function(e){
 	for (var fileIndex = 0; fileIndex < e.target.files.length; fileIndex++) {
 		var file = e.target.files[fileIndex];
 		if (/\.json/.test(file.name)) {
-			palette.fileInputReadJSON(file);
+			palette.fileInputReadAtlasJSON(file);
 		} else {
-			palette.fileInputReadImage(file);
+			palette.fileInputReadAtlasImage(file);
 		}
 	}
 });
 
-palette.fileInputReadJSON = function(file){
+palette.fileInputReadAtlasJSON = function(file){
 	try {
 		var reader = new FileReader();
 		reader.onload = function(){
@@ -149,7 +159,7 @@ palette.fileInputReadJSON = function(file){
 	}
 };
 
-palette.fileInputReadImage = function(file){
+palette.fileInputReadAtlasImage = function(file){
 	try {
 		var reader = new FileReader();
 		reader.onload = function(){
