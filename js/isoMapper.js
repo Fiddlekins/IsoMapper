@@ -165,7 +165,16 @@ isoMapper.interaction = {
 	},
 	viewPosition: {x: 0, y: 0},
 	downPosition: {x: 0, y: 0},
-	zIndexStep: settings['zIndexStep']
+	zIndexStep: settings['zIndexStep'],
+	checkAddRemoveTile: function(){
+		if (isoMapper.interaction.mouse.leftDown) {
+			if (isoMapper.interaction.mouse.leftShift) {
+				isoMapper.currentMap.removeTile(isoMapper.cursorCoordinate.x, isoMapper.cursorCoordinate.y, isoMapper.cursorCoordinate.z);
+			} else {
+				isoMapper.currentMap.addTile(isoMapper.cursorCoordinate.x, isoMapper.cursorCoordinate.y, isoMapper.cursorCoordinate.z);
+			}
+		}
+	}
 };
 
 isoMapper.canvasMain.addEventListener('mousedown', function(e){
@@ -228,21 +237,19 @@ isoMapper.canvasMain.addEventListener('mousemove', function(e){
 			isoMapper.cursorCoordinate.x = newCursorX;
 			isoMapper.cursorCoordinate.y = newCursorY;
 			isoMapper.isDirty.cursor = true;
-			if (isoMapper.interaction.mouse.leftDown) {
-				if (isoMapper.interaction.mouse.leftShift) {
-					isoMapper.currentMap.removeTile(isoMapper.cursorCoordinate.x, isoMapper.cursorCoordinate.y, isoMapper.cursorCoordinate.z);
-				} else {
-					isoMapper.currentMap.addTile(isoMapper.cursorCoordinate.x, isoMapper.cursorCoordinate.y, isoMapper.cursorCoordinate.z);
-				}
-			}
+			isoMapper.interaction.checkAddRemoveTile();
 		}
 	}
 });
 
 isoMapper.canvasMain.addEventListener('wheel', function(e){
-	isoMapper.interaction.mouse.scrollDeltaY += e.deltaY;
+	isoMapper.interaction.mouse.scrollDeltaY += e.shiftKey ? e.deltaX : e.deltaY;
+	var previousCursorZ = isoMapper.cursorCoordinate.z;
 	isoMapper.cursorCoordinate.z = Math.floor(isoMapper.interaction.mouse.scrollDeltaY / -100) * isoMapper.interaction.zIndexStep;
 	isoMapper.isDirty.cursor = true;
+	if (isoMapper.cursorCoordinate.z !== previousCursorZ) {
+		isoMapper.interaction.checkAddRemoveTile();
+	}
 });
 
 isoMapper.coordinateToPositionX = function(coordinateX, coordinateY){
