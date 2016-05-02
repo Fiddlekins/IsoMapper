@@ -243,9 +243,13 @@ isoMapper.canvasMain.addEventListener('mousemove', function(e){
 });
 
 isoMapper.canvasMain.addEventListener('wheel', function(e){
-	isoMapper.interaction.mouse.scrollDeltaY += e.shiftKey ? e.deltaX : e.deltaY;
+	if ((e.shiftKey ? e.deltaX : e.deltaY) < 0) {
+		isoMapper.interaction.mouse.scrollDeltaY += 1;
+	} else {
+		isoMapper.interaction.mouse.scrollDeltaY -= 1;
+	}
 	var previousCursorZ = isoMapper.cursorCoordinate.z;
-	isoMapper.cursorCoordinate.z = Math.floor(isoMapper.interaction.mouse.scrollDeltaY / -100) * isoMapper.interaction.zIndexStep;
+	isoMapper.cursorCoordinate.z = isoMapper.interaction.mouse.scrollDeltaY * isoMapper.interaction.zIndexStep;
 	isoMapper.isDirty.cursor = true;
 	if (isoMapper.cursorCoordinate.z !== previousCursorZ) {
 		isoMapper.interaction.checkAddRemoveTile();

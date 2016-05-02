@@ -4,6 +4,7 @@ var tools = {
 	container: document.getElementById('tools-container'),
 	header: document.getElementById('tools-header'),
 	importInput: document.createElement('input'),
+	zIndexInputParent: document.getElementById('tools-operation-z-index-parent'),
 	zIndexInput: document.getElementById('tools-operation-z-index'),
 	dragging: {
 		enabled: false,
@@ -67,8 +68,16 @@ tools.zIndexInput.addEventListener('keydown', function(e){
 	}
 });
 
+tools.zIndexInputParent.addEventListener('wheel', function(e){
+	if ((e.shiftKey ? e.deltaX : e.deltaY) < 0) {
+		tools.updateZIndex(tools.previouslyValidXIndexInput + 0.25);
+	} else {
+		tools.updateZIndex(tools.previouslyValidXIndexInput - 0.25);
+	}
+});
+
 tools.updateZIndex = function(value){
-	tools.previouslyValidXIndexInput = Math.max(Math.min(value, 25), 0.25);
+	tools.previouslyValidXIndexInput = Math.max(Math.min(value, 10), 0.25);
 	tools.zIndexInput.innerHTML = tools.previouslyValidXIndexInput;
 	isoMapper.interaction.zIndexStep = 4 * tools.previouslyValidXIndexInput;
 	settings['zIndexStep'] = isoMapper.interaction.zIndexStep;
