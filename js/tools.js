@@ -89,7 +89,7 @@ tools.importInputReadJSON = function(file){
 		var reader = new FileReader();
 		reader.onload = function(){
 			var importedData = JSON.parse(reader.result);
-			isoMapper.setCurrentMap(importedData);
+			isoMapper.currentMap.set(importedData);
 		};
 		reader.readAsText(file);
 	} catch (err) {
@@ -107,7 +107,7 @@ tools.operations['export'] = function(){
 };
 
 tools.operations['clear'] = function(){
-	isoMapper.setCurrentMap(JSON.parse(JSON.stringify(isoMapper.defaultMap)));
+	isoMapper.currentMap.reset();
 };
 
 tools.operations['resetView'] = function(){

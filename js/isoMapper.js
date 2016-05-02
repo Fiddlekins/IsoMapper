@@ -130,6 +130,7 @@ isoMapper.currentMap = {
 			isoMapper.currentMap['map'][x][y]['endIndexZ'] = z;
 		}
 		isoMapper.isDirty.main = true;
+		isoMapper.currentMap.autoSave();
 	},
 	removeTile: function(x, y, z){
 		if (isoMapper.currentMap['map'][x]) {
@@ -140,16 +141,39 @@ isoMapper.currentMap = {
 			}
 		}
 		isoMapper.isDirty.main = true;
+		isoMapper.currentMap.autoSave();
+	},
+	set: function(mapData){
+		isoMapper.currentMap['startIndexX'] = mapData['startIndexX'];
+		isoMapper.currentMap['endIndexX'] = mapData['endIndexX'];
+		isoMapper.currentMap['startIndexY'] = mapData['startIndexY'];
+		isoMapper.currentMap['endIndexY'] = mapData['endIndexY'];
+		isoMapper.currentMap['map'] = mapData['map'];
+		isoMapper.isDirty.all = true;
+	},
+	reset: function(){
+		isoMapper.currentMap.set(JSON.parse(JSON.stringify(isoMapper.defaultMap)));
+		isoMapper.currentMap.autoSave();
+	},
+	load: function(){
+		try {
+			if (localStorage['map']) {
+				isoMapper.currentMap.set(JSON.parse(localStorage['map']));
+			} else {
+				isoMapper.currentMap.reset();
+			}
+		} catch (err) {
+			console.error('Invalid JSON: ' + err);
+		}
+	},
+	save: function(){
+		localStorage['map'] = JSON.stringify(isoMapper.currentMap);
+	},
+	autoSave: function(){
+		if (settings['autoSave']) {
+			isoMapper.currentMap.save();
+		}
 	}
-};
-
-isoMapper.setCurrentMap = function(mapData){
-	isoMapper.currentMap['startIndexX'] = mapData['startIndexX'];
-	isoMapper.currentMap['endIndexX'] = mapData['endIndexX'];
-	isoMapper.currentMap['startIndexY'] = mapData['startIndexY'];
-	isoMapper.currentMap['endIndexY'] = mapData['endIndexY'];
-	isoMapper.currentMap['map'] = mapData['map'];
-	isoMapper.isDirty.all = true;
 };
 
 isoMapper.interaction = {

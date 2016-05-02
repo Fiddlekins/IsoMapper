@@ -13,7 +13,8 @@ var defaultSettings = {
 			'height': '200px'
 		}
 	},
-	'zIndexStep': 1
+	'zIndexStep': 1,
+	'autoSave': true
 };
 
 var settings = {};

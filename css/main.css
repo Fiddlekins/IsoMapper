@@ -33,6 +33,36 @@ body {
     background-color: #f6f6f6;
 }
 
+#palette-container {
+    min-width: 120px;
+}
+
+#palette-header-icons {
+    cursor: default;
+    position: absolute;
+    right: 16px;
+    top: 0;
+    height: 100%;
+}
+
+#palette-add-image {
+    background: url(../img/add-image-icon.png);
+}
+
+#palette-add-atlas {
+    background: url(../img/add-atlas-icon.png);
+}
+
+.palette-header-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+}
+
+.palette-header-icon:hover {
+    background-color: rgba(66, 203, 255, 0.2) !important;
+}
+
 #palette-container img {
     display: block;
     float: left;
@@ -45,6 +75,7 @@ body {
 
 #palette-tiles {
     overflow-y: scroll;
+    min-height: 17px;
 }
 
 .palette-tile:hover {
@@ -63,7 +94,7 @@ body {
     height: 17px;
     cursor: se-resize;
     background: url(../img/se-resize-icon.png);
-    background-color: rgb(241, 241, 241);;
+    background-color: rgb(241, 241, 241);
 }
 
 #palette-resize-corner:hover {

@@ -29,8 +29,13 @@
     <canvas id="canvas-main" class="canvas-fullScreen"></canvas>
     <canvas id="canvas-cursor" class="canvas-fullScreen"></canvas>
     <div id="palette-container" class="menu-container">
-        <div id="palette-header" class="menu-header noSelect">Palette</div>
-        <input id="atlas-load" type="file" multiple="multiple">
+        <div id="palette-header" class="menu-header noSelect">
+            Palette
+            <div id="palette-header-icons">
+                <span id="palette-add-image" class="palette-header-icon" title="Add single images"></span>
+                <span id="palette-add-atlas" class="palette-header-icon" title="Add atlas files"></span>
+            </div>
+        </div>
         <div id="palette-tiles"></div>
         <div id="palette-resize-corner"></div>
     </div>

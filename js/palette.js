@@ -3,7 +3,20 @@
 var palette = {
 	container: document.getElementById('palette-container'),
 	header: document.getElementById('palette-header'),
-	fileInput: document.getElementById('atlas-load'),
+	addImageButton: document.getElementById('palette-add-image'),
+	addAtlasButton: document.getElementById('palette-add-atlas'),
+	imageFileInput: (function(){
+		var input = document.createElement('input');
+		input.type = 'file';
+		input.multiple = true;
+		return input;
+	})(),
+	atlasFileInput: (function(){
+		var input = document.createElement('input');
+		input.type = 'file';
+		input.multiple = true;
+		return input;
+	})(),
 	tiles: document.getElementById('palette-tiles'),
 	resizeCorner: document.getElementById('palette-resize-corner'),
 	selectedTile: '',
@@ -69,6 +82,18 @@ var palette = {
 	}
 };
 
+palette.addImageButton.addEventListener('mousedown', function(e){
+	e.stopPropagation();
+	var clickEvent = new MouseEvent('click');
+	palette.imageFileInput.dispatchEvent(clickEvent);
+});
+
+palette.addAtlasButton.addEventListener('mousedown', function(e){
+	e.stopPropagation();
+	var clickEvent = new MouseEvent('click');
+	palette.atlasFileInput.dispatchEvent(clickEvent);
+});
+
 palette.container.addEventListener('mousedown', function(e){
 	if (e.target.dataset.name) {
 		isoMapper.cursorType = e.target.dataset.name;
@@ -103,18 +128,25 @@ palette.resizeCorner.addEventListener('mousedown', function(e){
 	e.preventDefault();
 });
 
-palette.fileInput.addEventListener('change', function(e){
+palette.imageFileInput.addEventListener('change', function(e){
+	for (var fileIndex = 0; fileIndex < e.target.files.length; fileIndex++) {
+		var file = e.target.files[fileIndex];
+		atlas.processRawImage(file);
+	}
+});
+
+palette.atlasFileInput.addEventListener('change', function(e){
 	for (var fileIndex = 0; fileIndex < e.target.files.length; fileIndex++) {
 		var file = e.target.files[fileIndex];
 		if (/\.json/.test(file.name)) {
-			palette.fileInputReadJSON(file);
+			palette.fileInputReadAtlasJSON(file);
 		} else {
-			palette.fileInputReadImage(file);
+			palette.fileInputReadAtlasImage(file);
 		}
 	}
 });
 
-palette.fileInputReadJSON = function(file){
+palette.fileInputReadAtlasJSON = function(file){
 	try {
 		var reader = new FileReader();
 		reader.onload = function(){
@@ -127,7 +159,7 @@ palette.fileInputReadJSON = function(file){
 	}
 };
 
-palette.fileInputReadImage = function(file){
+palette.fileInputReadAtlasImage = function(file){
 	try {
 		var reader = new FileReader();
 		reader.onload = function(){

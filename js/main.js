@@ -25,6 +25,10 @@ atlas.addToManifestLib('missing-tile.png', {
 	]
 });
 
+if (settings['autoSave']) {
+	isoMapper.currentMap.load();
+}
+
 isoMapper.generateGrid();
 isoMapper.view.reset();
 window.requestAnimationFrame(isoMapper.draw);
