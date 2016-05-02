@@ -4,6 +4,7 @@ var tools = {
 	container: document.getElementById('tools-container'),
 	header: document.getElementById('tools-header'),
 	importInput: document.createElement('input'),
+	zIndexInputParent: document.getElementById('tools-operation-z-index-parent'),
 	zIndexInput: document.getElementById('tools-operation-z-index'),
 	dragging: {
 		enabled: false,
@@ -63,6 +64,14 @@ tools.zIndexInput.addEventListener('keydown', function(e){
 	if (e.code === 'ArrowUp') {
 		tools.updateZIndex(tools.previouslyValidXIndexInput + 0.25);
 	} else if (e.code === 'ArrowDown') {
+		tools.updateZIndex(tools.previouslyValidXIndexInput - 0.25);
+	}
+});
+
+tools.zIndexInputParent.addEventListener('wheel', function(e){
+	if ((e.shiftKey ? e.deltaX : e.deltaY) < 0) {
+		tools.updateZIndex(tools.previouslyValidXIndexInput + 0.25);
+	} else {
 		tools.updateZIndex(tools.previouslyValidXIndexInput - 0.25);
 	}
 });
