@@ -84,6 +84,11 @@ body {
     background-color: rgba(66, 203, 255, 0.5) !important;
 }
 
+#tools-operation-z-index {
+    min-width: 36px;
+    display: inline-block;
+}
+
 .noSelect {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Chrome/Safari/Opera */

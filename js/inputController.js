@@ -2,8 +2,15 @@
 
 // Global event listeners go here
 
+var mousePosition = {
+	x: 0,
+	y: 0
+};
+
 window.addEventListener('mousemove', function(e){
 	e.preventDefault();
+	mousePosition.x = e.clientX;
+	mousePosition.y = e.clientY;
 	if (tools.dragging.enabled) {
 		tools.updatePosition(
 			(tools.dragging.x + e.clientX - tools.dragging.downX) + 'px',
@@ -22,9 +29,9 @@ window.addEventListener('mousemove', function(e){
 			(palette.resizing.height + e.clientY - palette.resizing.downY) + 'px'
 		);
 	}
-	if (isoMapper.mouseInteraction.mouseMiddleDown) {
-		isoMapper.viewPosition.x = isoMapper.mouseInteraction.viewPosition.x - (e.clientX - isoMapper.mouseInteraction.downPosition.x);
-		isoMapper.viewPosition.y = isoMapper.mouseInteraction.viewPosition.y - (e.clientY - isoMapper.mouseInteraction.downPosition.y);
+	if (isoMapper.interaction.mouse.middleDown || isoMapper.interaction.key.spaceBarDown) {
+		isoMapper.viewPosition.x = isoMapper.interaction.viewPosition.x - (e.clientX - isoMapper.interaction.downPosition.x);
+		isoMapper.viewPosition.y = isoMapper.interaction.viewPosition.y - (e.clientY - isoMapper.interaction.downPosition.y);
 		isoMapper.isDirty.all = true;
 	}
 });
@@ -44,3 +51,34 @@ window.addEventListener('resize', function(e){
 	isoMapper.generateGrid();
 	isoMapper.isDirty.all = true;
 });
+
+window.addEventListener('keydown', function(e){
+	if (inputController.keyFunctionMapping.hasOwnProperty(e.code) && inputController.keyFunctionMapping[e.code].down) {
+		inputController.keyFunctionMapping[e.code].down();
+	}
+});
+
+window.addEventListener('keyup', function(e){
+	if (inputController.keyFunctionMapping.hasOwnProperty(e.code) && inputController.keyFunctionMapping[e.code].up) {
+		inputController.keyFunctionMapping[e.code].up();
+	}
+});
+
+var inputController = {};
+
+inputController.keyFunctionMapping = {
+	'Space': {
+		down: function(){
+			if (!isoMapper.interaction.key.spaceBarDown) {
+				isoMapper.interaction.key.spaceBarDown = true;
+				isoMapper.interaction.viewPosition.x = isoMapper.viewPosition.x;
+				isoMapper.interaction.viewPosition.y = isoMapper.viewPosition.y;
+				isoMapper.interaction.downPosition.x = mousePosition.x;
+				isoMapper.interaction.downPosition.y = mousePosition.y
+			}
+		},
+		up: function(){
+			isoMapper.interaction.key.spaceBarDown = false;
+		}
+	}
+};
