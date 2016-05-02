@@ -54,21 +54,18 @@ atlas.processRawImage = function(file){
 		var stagingImage = document.createElement('img');
 		stagingImage.src = dataUrl;
 
-		var stagingCanvas = document.createElement('canvas');
-		var ctx = stagingCanvas.getContext('2d');
-
 		stagingImage.onload = function(){
-			stagingCanvas.width = stagingImage.width;
-			stagingCanvas.height = stagingImage.height;
-			ctx.drawImage(stagingImage, 0, 0);
-			var imgData = ctx.getImageData(0, 0, stagingCanvas.width, stagingCanvas.height);
+			atlas.canvas.width = stagingImage.width;
+			atlas.canvas.height = stagingImage.height;
+			atlas.ctx.drawImage(stagingImage, 0, 0);
+			var imgData = atlas.ctx.getImageData(0, 0, atlas.canvas.width, atlas.canvas.height);
 			var trimmedDimensions = atlas.getTrimmedDimensions(imgData);
 
 			// By resizing the canvas we should also fully clean it
-			stagingCanvas.width = trimmedDimensions.width;
-			stagingCanvas.height = trimmedDimensions.height;
+			atlas.canvas.width = trimmedDimensions.width;
+			atlas.canvas.height = trimmedDimensions.height;
 
-			ctx.drawImage(
+			atlas.ctx.drawImage(
 				stagingImage,
 				trimmedDimensions.x,
 				trimmedDimensions.y,
@@ -80,7 +77,7 @@ atlas.processRawImage = function(file){
 				trimmedDimensions.height
 			);
 
-			atlas.addToImgLib(file.name, stagingCanvas.toDataURL());
+			atlas.addToImgLib(file.name, atlas.canvas.toDataURL());
 			atlas.addToManifestLib(file.name, {
 				'tiles': [
 					{
