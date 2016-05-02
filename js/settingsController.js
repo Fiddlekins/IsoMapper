@@ -12,7 +12,8 @@ var defaultSettings = {
 			'width': '315px',
 			'height': '200px'
 		}
-	}
+	},
+	'zIndexStep': 1
 };
 
 var settings = {};

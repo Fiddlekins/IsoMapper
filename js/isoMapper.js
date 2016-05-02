@@ -164,7 +164,8 @@ isoMapper.interaction = {
 		spaceBarDown: false
 	},
 	viewPosition: {x: 0, y: 0},
-	downPosition: {x: 0, y: 0}
+	downPosition: {x: 0, y: 0},
+	zIndexStep: settings['zIndexStep']
 };
 
 isoMapper.canvasMain.addEventListener('mousedown', function(e){
@@ -240,7 +241,7 @@ isoMapper.canvasMain.addEventListener('mousemove', function(e){
 
 isoMapper.canvasMain.addEventListener('wheel', function(e){
 	isoMapper.interaction.mouse.scrollDeltaY += e.deltaY;
-	isoMapper.cursorCoordinate.z = Math.floor(isoMapper.interaction.mouse.scrollDeltaY / -100);
+	isoMapper.cursorCoordinate.z = Math.floor(isoMapper.interaction.mouse.scrollDeltaY / -100) * isoMapper.interaction.zIndexStep;
 	isoMapper.isDirty.cursor = true;
 });
 
